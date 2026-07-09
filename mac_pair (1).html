@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>DreamPair — macOS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{
+  --mac-bg:#1c1c1e;
+  --mac-sidebar:#2c2c2e;
+  --mac-card:#3a3a3c;
+  --mac-card2:#48484a;
+  --mac-border:rgba(255,255,255,0.10);
+  --mac-border2:rgba(255,255,255,0.06);
+  --mac-text:#f5f5f7;
+  --mac-text2:#aeaeb2;
+  --mac-text3:#6e6e73;
+  --mac-chat-bg:#000;
+  --mac-chat-bar:rgba(28,28,30,0.98);
+  --mac-chat-border:rgba(255,255,255,0.07);
+  --mac-chat-bubble:#3a3a3c;
+  --mac-chat-input:rgba(255,255,255,0.07);
+  --mac-titlebar-from:rgba(80,80,82,0.95);
+  --mac-titlebar-to:rgba(58,58,60,0.97);
+  --mac-strip:rgba(38,38,40,0.98);
+  --mac-strip-border:rgba(0,0,0,0.45);
+  --mac-body-bg1:#1a2744;
+  --mac-body-bg2:#1c1c1e;
+  --mac-body-bg3:#0d0d0f;
+  --mac-hover:rgba(255,255,255,0.04);
+  --mac-focus-bg:rgba(63,124,248,0.10);
+  --user-accent:#3f7cf8;
+  --user-accent-soft:rgba(63,124,248,0.12);
+  --user-font:'Pretendard',system-ui,sans-serif;
+  --tl-red:#ff5f57;
+  --tl-yellow:#ffbd2e;
+  --tl-green:#28c840;
+}
+/* ── Light / White theme ── */
+body.light-theme{
+  --mac-bg:#f5f5f7;
+  --mac-sidebar:#e8e8ed;
+  --mac-card:#ffffff;
+  --mac-card2:#f2f2f7;
+  --mac-border:rgba(0,0,0,0.08);
+  --mac-border2:rgba(0,0,0,0.05);
+  --mac-text:#1c1c1e;
+  --mac-text2:#48484a;
+  --mac-text3:#8e8e93;
+  --mac-chat-bg:#f2f2f7;
+  --mac-chat-bar:rgba(242,242,247,0.98);
+  --mac-chat-border:rgba(0,0,0,0.08);
+  --mac-chat-bubble:#e5e5ea;
+  --mac-chat-input:rgba(0,0,0,0.06);
+  --mac-titlebar-from:rgba(215,215,220,0.97);
+  --mac-titlebar-to:rgba(200,200,205,0.98);
+  --mac-strip:rgba(232,232,237,0.98);
+  --mac-strip-border:rgba(0,0,0,0.10);
+  --mac-body-bg1:#dde6f0;
+  --mac-body-bg2:#e8eef5;
+  --mac-body-bg3:#d0dae5;
+  --mac-hover:rgba(0,0,0,0.04);
+  --mac-focus-bg:rgba(63,124,248,0.08);
+  --user-accent-soft:rgba(63,124,248,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:var(--user-font);
+  background:radial-gradient(ellipse at 20% 0%,var(--mac-body-bg1) 0%,var(--mac-body-bg2) 50%,var(--mac-body-bg3) 100%);
+  color:var(--mac-text);
+  min-height:100vh;
+  padding:24px 0 80px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+#toolbar{width:640px;margin:0 auto 14px;display:flex;flex-direction:column;gap:8px;}
+.tb-line{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+#palette-row{display:flex;gap:6px;align-items:center;}
+#palette-row>span{font-size:11px;color:var(--mac-text3);}
+.swatch{width:17px;height:17px;border-radius:50%;cursor:pointer;box-shadow:0 0 0 2px rgba(128,128,128,0.25);transition:transform .15s,box-shadow .15s;}
+.swatch:hover{transform:scale(1.2);box-shadow:0 0 0 2.5px var(--user-accent);}
+.swatch.white-swatch{background:linear-gradient(135deg,#fff 0%,#e8e8ed 100%);box-shadow:0 0 0 2px rgba(0,0,0,0.15);}
+body.light-theme .swatch{box-shadow:0 0 0 2px rgba(0,0,0,0.15);}
+#custom-color-row{display:flex;gap:5px;align-items:center;}
+#custom-color-row span{font-size:11px;color:var(--mac-text3);}
+#custom-color-row input[type="color"]{width:20px;height:20px;border:none;border-radius:50%;padding:0;cursor:pointer;background:none;box-shadow:0 0 0 2px rgba(128,128,128,0.25);}
+#font-row{display:flex;gap:8px;align-items:center;}
+#font-row>span{font-size:11px;color:var(--mac-text3);}
+#font-row select{background:var(--mac-sidebar);color:var(--mac-text);font-size:11px;border:1px solid var(--mac-border);border-radius:6px;padding:3px 7px;font-family:var(--user-font);}
+.aa-toggle{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mac-text3);cursor:pointer;}
+.mac-btn{display:inline-flex;align-items:center;gap:5px;background:var(--mac-hover);color:var(--mac-text);font-size:11.5px;font-weight:500;padding:5px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--mac-border);backdrop-filter:blur(8px);transition:background .15s;font-family:var(--user-font);user-select:none;}
+.mac-btn:hover{background:var(--mac-card);}
+.mac-btn.accent{background:var(--user-accent);color:#fff;border-color:transparent;}
+.mac-btn.accent:hover{filter:brightness(1.1);}
+.mac-btn.preview-active{background:var(--user-accent-soft);color:var(--user-accent);border-color:var(--user-accent);}
+.btn-row{display:flex;gap:6px;margin:10px 20px 18px;flex-wrap:wrap;}
+.add-btn{display:inline-flex;align-items:center;gap:4px;background:var(--mac-hover);color:var(--mac-text2);font-size:11px;font-weight:500;padding:5px 11px;border-radius:7px;cursor:pointer;border:1px solid var(--mac-border);font-family:var(--user-font);user-select:none;transition:background .15s;}
+.add-btn:hover{background:var(--mac-card);color:var(--mac-text);}
+
+/* Window */
+#frame{width:640px;margin:0 auto;background:var(--mac-bg);border-radius:14px;border:1px solid var(--mac-border);box-shadow:0 0 0 1px rgba(0,0,0,0.3),0 24px 60px rgba(0,0,0,0.5);overflow:hidden;position:relative;}
+
+/* Titlebar */
+#mac-titlebar{display:flex;align-items:center;background:linear-gradient(180deg,var(--mac-titlebar-from) 0%,var(--mac-titlebar-to) 100%);border-bottom:1px solid var(--mac-strip-border);padding:10px 14px;gap:10px;}
+.tl-group{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.tl-dot{width:13px;height:13px;border-radius:50%;cursor:default;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;}
+.tl-dot::after{content:'';font-size:0;font-weight:900;color:rgba(0,0,0,0);line-height:1;transition:font-size .1s;}
+.tl-group:hover .tl-dot::after{font-size:7px;color:rgba(0,0,0,0.5);}
+.tl-dot.red{background:var(--tl-red);box-shadow:0 0 0 .5px rgba(0,0,0,0.25);}
+.tl-dot.red::after{content:'✕';}
+.tl-dot.yellow{background:var(--tl-yellow);box-shadow:0 0 0 .5px rgba(0,0,0,0.25);}
+.tl-dot.yellow::after{content:'−';}
+.tl-dot.green{background:var(--tl-green);box-shadow:0 0 0 .5px rgba(0,0,0,0.25);}
+.tl-dot.green::after{content:'+';}
+#mac-title-center{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;}
+#mac-title-icon{font-size:14px;cursor:pointer;user-select:none;position:relative;display:inline-flex;align-items:center;}
+#mac-title-icon-char{display:inline-block;line-height:1;}
+#mac-title-text{font-size:13px;font-weight:600;color:var(--mac-text2);outline:none;cursor:text;text-align:center;}
+#mac-title-text:focus{color:var(--mac-text);}
+.mac-win-spacer{width:46px;flex-shrink:0;}
+
+/* Emoji picker */
+#emoji-picker{display:none;position:absolute;top:30px;left:-6px;z-index:200;background:var(--mac-card);border:1px solid var(--mac-border);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.4);backdrop-filter:blur(20px);padding:8px;flex-wrap:wrap;gap:2px;width:290px;}
+#emoji-picker.open{display:flex;}
+.ep-emoji{font-size:20px;cursor:pointer;padding:3px 4px;line-height:1;border-radius:6px;transition:background .1s;}
+.ep-emoji:hover{background:var(--mac-hover);}
+.mac-win-btns{display:flex;gap:6px;}
+.mac-win-btn{background:var(--mac-hover);color:var(--mac-text2);font-size:11px;font-weight:500;padding:3px 10px;border-radius:5px;border:1px solid var(--mac-border);cursor:default;user-select:none;}
+
+/* Toolbar strip */
+#mac-toolbar-strip{display:flex;align-items:center;background:var(--mac-strip);border-bottom:1px solid var(--mac-strip-border);padding:0 14px;overflow-x:auto;}
+.mac-menu-item{font-size:12px;color:var(--mac-text2);padding:7px 10px;cursor:default;border-radius:4px;user-select:none;white-space:nowrap;transition:background .1s;}
+.mac-menu-item:hover{background:var(--mac-hover);color:var(--mac-text);}
+
+/* Card */
+#card{background:var(--mac-bg);position:relative;}
+
+/* Header — left aligned */
+#tpl-header{padding:28px 24px 22px;text-align:left;border-bottom:1px solid var(--mac-border2);position:relative;background:linear-gradient(180deg,var(--user-accent-soft) 0%,transparent 100%);}
+#tpl-header .corner{position:absolute;top:12px;right:16px;font-size:9px;color:var(--mac-text3);letter-spacing:1.5px;font-weight:500;}
+#tpl-pairname{font-size:26px;font-weight:800;color:var(--mac-text);letter-spacing:-.5px;outline:none;font-family:var(--user-font);}
+#tpl-pairtag{font-size:11px;color:var(--mac-text3);letter-spacing:.8px;margin-top:5px;outline:none;}
+#tpl-catch{font-size:12px;color:var(--mac-text2);margin-top:14px;line-height:1.65;outline:none;border-top:1px solid var(--mac-border2);padding-top:12px;}
+
+/* Section label */
+.sec-label{display:flex;align-items:center;gap:8px;margin:20px 20px 10px;font-size:10.5px;color:var(--mac-text3);letter-spacing:1.2px;font-weight:600;text-transform:uppercase;}
+.sec-label::before{content:"";width:3px;height:12px;background:var(--user-accent);border-radius:2px;}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--mac-border2);}
+
+/* Chars */
+#tpl-chars{display:flex;flex-direction:column;gap:10px;margin:0 20px;}
+.char-card{display:flex;background:var(--mac-card);border-radius:12px;border:1px solid var(--mac-border);overflow:hidden;position:relative;}
+.char-photo-col{width:110px;flex-shrink:0;background:repeating-linear-gradient(135deg,var(--mac-sidebar),var(--mac-sidebar) 9px,var(--mac-card) 9px,var(--mac-card) 18px);background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;font-size:9.5px;color:var(--mac-text3);border-right:1px solid var(--mac-border);cursor:pointer;position:relative;text-align:center;}
+.char-photo-col span{background:rgba(0,0,0,0.45);color:#fff;padding:4px 7px;border-radius:6px;font-size:9px;}
+.char-photo-col.has-photo span{display:none;}
+.char-photo-col.has-photo:hover span{display:inline-block;}
+.char-photo-input{display:none;}
+.char-info-col{flex:1;padding:12px 14px;min-width:0;}
+.char-quote{font-size:10px;color:var(--mac-text3);font-style:italic;outline:none;margin-bottom:5px;}
+.char-name-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+.char-name{font-size:15px;font-weight:700;color:var(--mac-text);outline:none;font-family:var(--user-font);}
+.char-keywords{font-size:9.5px;color:var(--user-accent);outline:none;font-weight:500;}
+.char-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 6px;margin-top:9px;padding-top:9px;border-top:1px solid var(--mac-border2);}
+.stat-cell{text-align:center;}
+.stat-label{font-size:8px;color:var(--mac-text3);outline:none;}
+.stat-value{font-size:10px;color:var(--mac-text);font-weight:600;outline:none;margin-top:1px;}
+.char-desc{font-size:9.5px;color:var(--mac-text2);margin-top:9px;line-height:1.65;outline:none;}
+.char-x{position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;background:rgba(255,95,87,0.75);color:#fff;font-size:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;}
+.char-x:hover{background:var(--tl-red);}
+.add-char-card{border:1px dashed var(--mac-border);text-align:center;padding:14px;color:var(--mac-text3);font-size:11px;cursor:pointer;border-radius:12px;background:transparent;}
+.add-char-card:hover{background:var(--mac-hover);color:var(--mac-text2);}
+
+/* Relation */
+#tpl-rel{margin:0 20px;font-size:11px;color:var(--mac-text2);text-align:center;outline:none;background:var(--user-accent-soft);border:1px solid var(--mac-border);border-radius:8px;padding:10px 12px;line-height:1.6;}
+
+/* Timeline */
+#tpl-timeline-wrap{margin:0 20px;background:var(--mac-card);border-radius:12px;border:1px solid var(--mac-border);padding:18px 16px 14px 14px;}
+#tpl-timeline{display:flex;align-items:flex-start;gap:0;width:100%;}
+.tl-node{flex:1 1 0;min-width:0;position:relative;padding:0 10px 0 0;}
+.tl-line{position:relative;height:14px;}
+.tl-line::before{content:"";position:absolute;left:6px;right:-4px;top:5px;height:1.5px;background:linear-gradient(90deg,var(--user-accent) 0%,var(--mac-border) 100%);}
+.tl-node:last-child .tl-line::before{display:none;}
+.timeline-dot{position:absolute;left:0;top:1px;width:11px;height:11px;border-radius:50%;background:var(--user-accent);box-shadow:0 0 0 3px var(--user-accent-soft);}
+.tl-date{font-size:8.5px;color:var(--mac-text3);margin-top:2px;outline:none;}
+.tl-title{font-size:10.5px;color:var(--mac-text);font-weight:600;outline:none;line-height:1.3;word-break:break-word;}
+.tl-desc{font-size:9px;color:var(--mac-text2);margin-top:2px;outline:none;line-height:1.4;word-break:break-word;}
+.tl-del{position:absolute;top:-13px;right:2px;font-size:8px;color:var(--tl-red);cursor:pointer;opacity:0;transition:opacity .15s;}
+.tl-node:hover .tl-del{opacity:1;}
+
+/* Two-col */
+#tpl-twocol{display:flex;gap:10px;margin:0 20px;}
+.small-box{flex:1;background:var(--mac-card);padding:12px;border-radius:12px;border:1px solid var(--mac-border);}
+.small-box-title{font-size:9.5px;color:var(--mac-text3);letter-spacing:1px;margin-bottom:6px;font-weight:600;text-transform:uppercase;}
+#world-name{font-size:12px;font-weight:700;color:var(--mac-text);outline:none;}
+#world-desc{font-size:9.5px;color:var(--mac-text2);margin-top:4px;line-height:1.6;outline:none;min-height:34px;}
+
+/* iMessage chat */
+#chat-box{padding:0;background:none;border:none;}
+#msg-window{background:var(--mac-chat-bg);border-radius:14px;overflow:hidden;border:1px solid var(--mac-border);}
+#msg-titlebar{display:flex;justify-content:space-between;align-items:center;background:var(--mac-chat-bar);border-bottom:1px solid var(--mac-chat-border);padding:8px 10px;}
+.msg-tb-left{display:flex;align-items:center;gap:5px;}
+.msg-tl-dot{width:10px;height:10px;border-radius:50%;}
+.msg-tl-dot.r{background:#ff5f57;}.msg-tl-dot.y{background:#ffbd2e;}.msg-tl-dot.g{background:#28c840;}
+#msg-window-title{font-size:12px;font-weight:600;color:var(--mac-text2);outline:none;text-align:center;flex:1;}
+#chat-list{padding:10px 8px;background:var(--mac-chat-bg);display:flex;flex-direction:column;gap:6px;}
+.chat-row{display:flex;align-items:flex-end;gap:6px;}
+.chat-row.b{flex-direction:row-reverse;}
+.chat-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;background:var(--mac-card2);background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 0 0 1.5px var(--mac-border);}
+.chat-row.b .chat-avatar{background:#6e4b7b;}
+.chat-avatar.has-photo{font-size:0;}
+.chat-avatar-input{display:none;}
+.chat-bubble-col{max-width:190px;display:flex;flex-direction:column;gap:2px;}
+.chat-row.b .chat-bubble-col{align-items:flex-end;}
+.chat-name{font-size:9px;color:var(--mac-text3);padding:0 6px;outline:none;}
+.chat-colon{display:none;}
+.chat-bubble{display:inline-block;font-size:11px;padding:7px 11px;border-radius:18px;border-bottom-left-radius:4px;outline:none;line-height:1.45;word-break:break-word;background:var(--mac-chat-bubble);color:var(--mac-text);}
+.chat-row.b .chat-bubble{background:var(--user-accent);color:#fff;border-bottom-left-radius:18px;border-bottom-right-radius:4px;}
+.chat-time{font-size:8px;color:var(--mac-text3);padding:0 6px;}
+.chat-del{font-size:9px;color:var(--tl-red);cursor:pointer;align-self:center;flex-shrink:0;}
+#msg-toolbar{display:flex;align-items:center;justify-content:space-between;background:var(--mac-chat-bar);border-top:1px solid var(--mac-chat-border);padding:7px 10px;}
+#msg-toolbar-icons{display:none;}
+#msg-input-area{flex:1;background:var(--mac-chat-input);border-radius:16px;padding:4px 10px;font-size:10px;color:var(--mac-text3);border:1px solid var(--mac-border);outline:none;}
+#msg-send{font-size:17px;cursor:default;opacity:.6;margin-left:8px;}
+#msg-status{margin-top:6px;background:var(--mac-hover);border:1px solid var(--mac-border2);border-radius:8px;padding:7px 10px;font-size:10px;color:var(--mac-text3);outline:none;}
+
+/* Comments */
+#tpl-comments{margin:0 20px;}
+.gb-entry{font-size:10px;color:var(--mac-text2);border-bottom:1px solid var(--mac-border2);padding:6px 2px;line-height:1.55;}
+.gb-entry:last-child{border-bottom:none;}
+.gb-entry b{color:var(--user-accent);outline:none;font-weight:600;}
+.gb-entry span{outline:none;}
+
+/* Footer */
+#tpl-footer{margin-top:16px;background:var(--mac-card);border-top:1px solid var(--mac-border2);color:var(--mac-text3);font-size:9px;text-align:center;padding:9px;letter-spacing:.5px;}
+
+/* Stickers */
+#sticker-layer{position:absolute;inset:0;pointer-events:none;z-index:80;overflow:visible;}
+.sticker{position:absolute;pointer-events:auto;cursor:grab;user-select:none;touch-action:none;}
+.sticker:active{cursor:grabbing;}
+.sticker img{display:block;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none;}
+.sticker-del{position:absolute;top:-8px;right:-8px;width:17px;height:17px;border-radius:50%;background:var(--tl-red);color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;}
+.sticker-resize{position:absolute;bottom:-5px;right:-5px;width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.85);border:1.5px solid rgba(0,0,0,0.2);cursor:nwse-resize;pointer-events:auto;z-index:2;}
+
+/* contenteditable */
+[contenteditable]:hover{background:var(--mac-hover);border-radius:4px;}
+[contenteditable]:focus{background:var(--mac-focus-bg);border-radius:4px;outline:none;}
+
+/* Preview banner */
+#preview-banner{display:none;width:640px;margin:0 auto 10px;background:var(--user-accent-soft);color:var(--user-accent);border:1px solid var(--mac-border);border-radius:10px;font-size:11.5px;padding:8px 14px;text-align:center;}
+body.previewing #preview-banner{display:block;}
+
+/* Hide edit UI on export / preview */
+body.exporting .char-x,body.exporting .char-photo-col span,body.exporting .char-photo-col.has-photo span,body.exporting .tl-del,body.exporting .chat-del,body.exporting .add-char-card,body.exporting .sticker-del,body.exporting .sticker-resize,body.exporting .btn-row,
+body.previewing .char-x,body.previewing .char-photo-col span,body.previewing .char-photo-col.has-photo span,body.previewing .tl-del,body.previewing .chat-del,body.previewing .add-char-card,body.previewing .sticker-del,body.previewing .sticker-resize,body.previewing .btn-row{display:none!important;}
+body.exporting [contenteditable]:hover,body.exporting [contenteditable]:focus,
+body.previewing [contenteditable]:hover,body.previewing [contenteditable]:focus{background:transparent!important;}
+body.previewing .sticker{cursor:grab;}
+body.no-aa,body.no-aa *{-webkit-font-smoothing:none!important;-moz-osx-font-smoothing:unset!important;}
+</style>
+</head>
+<body>
+
+<div id="preview-banner">🔍 미리보기 — 실제 저장 결과입니다. 스티커는 이 상태에서 드래그 가능해요.</div>
+
+<div id="toolbar">
+  <div class="tb-line">
+    <div id="palette-row">
+      <span>테마</span>
+      <div class="swatch" style="background:#3f7cf8" data-c="#3f7cf8,rgba(63,124,248,0.12)" data-mode="dark"></div>
+      <div class="swatch" style="background:#bf5af2" data-c="#bf5af2,rgba(191,90,242,0.12)" data-mode="dark"></div>
+      <div class="swatch" style="background:#ff375f" data-c="#ff375f,rgba(255,55,95,0.12)" data-mode="dark"></div>
+      <div class="swatch" style="background:#ff9f0a" data-c="#ff9f0a,rgba(255,159,10,0.12)" data-mode="dark"></div>
+      <div class="swatch" style="background:#30d158" data-c="#30d158,rgba(48,209,88,0.12)" data-mode="dark"></div>
+      <div class="swatch" style="background:#64d2ff" data-c="#64d2ff,rgba(100,210,255,0.12)" data-mode="dark"></div>
+      <div class="swatch white-swatch" title="화이트 테마" data-c="#3f7cf8,rgba(63,124,248,0.10)" data-mode="light"></div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <span class="mac-btn" id="preview-btn">🔍 미리보기</span>
+      <span class="mac-btn accent" id="export-btn">↓ 이미지 저장</span>
+    </div>
+  </div>
+  <div class="tb-line">
+    <div id="custom-color-row">
+      <span>커스텀</span>
+      <input type="color" id="cc-accent" value="#3f7cf8" title="포인트 색상">
+      <input type="color" id="cc-bg"     value="#1c1c1e" title="배경 색상">
+      <input type="color" id="cc-card"   value="#3a3a3c" title="카드 색상">
+    </div>
+    <span class="mac-btn" id="add-sticker-btn">🖼 스티커 추가</span>
+    <input type="file" id="sticker-input" accept="image/*" multiple style="display:none">
+  </div>
+  <div class="tb-line">
+    <div id="font-row">
+      <span>폰트</span>
+      <select id="font-select">
+        <option value="'Pretendard',system-ui,sans-serif">프리텐다드</option>
+        <option value="-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif">SF Pro (시스템)</option>
+        <option value="Georgia,serif">Georgia</option>
+        <option value="monospace">모노스페이스</option>
+      </select>
+      <label class="aa-toggle"><input type="checkbox" id="aa-toggle" checked> 안티에일리어싱</label>
+    </div>
+  </div>
+</div>
+
+<div id="frame">
+  <div id="mac-titlebar">
+    <div class="tl-group">
+      <span class="tl-dot red"></span>
+      <span class="tl-dot yellow"></span>
+      <span class="tl-dot green"></span>
+    </div>
+    <div id="mac-title-center">
+      <span id="mac-title-icon" title="아이콘 변경">
+        <span id="mac-title-icon-char">💾</span>
+        <div id="emoji-picker">
+          <span class="ep-emoji">🩷</span><span class="ep-emoji">🤍</span><span class="ep-emoji">💙</span><span class="ep-emoji">💜</span><span class="ep-emoji">🖤</span>
+          <span class="ep-emoji">🩵</span><span class="ep-emoji">🧡</span><span class="ep-emoji">💛</span><span class="ep-emoji">💚</span><span class="ep-emoji">🤎</span>
+          <span class="ep-emoji">💗</span><span class="ep-emoji">💓</span><span class="ep-emoji">💞</span><span class="ep-emoji">💝</span><span class="ep-emoji">💘</span>
+          <span class="ep-emoji">🫀</span><span class="ep-emoji">💌</span><span class="ep-emoji">🫧</span><span class="ep-emoji">✨</span><span class="ep-emoji">💫</span>
+          <span class="ep-emoji">🌸</span><span class="ep-emoji">🌺</span><span class="ep-emoji">🌼</span><span class="ep-emoji">🌻</span><span class="ep-emoji">🌷</span>
+          <span class="ep-emoji">🪷</span><span class="ep-emoji">🍀</span><span class="ep-emoji">🌿</span><span class="ep-emoji">🍃</span><span class="ep-emoji">🍄</span>
+          <span class="ep-emoji">🦋</span><span class="ep-emoji">🐱</span><span class="ep-emoji">🐰</span><span class="ep-emoji">🦊</span><span class="ep-emoji">🐻</span>
+          <span class="ep-emoji">🐼</span><span class="ep-emoji">🐧</span><span class="ep-emoji">🐸</span><span class="ep-emoji">🐨</span><span class="ep-emoji">🦄</span>
+          <span class="ep-emoji">🐝</span><span class="ep-emoji">🐞</span><span class="ep-emoji">🦎</span><span class="ep-emoji">🐙</span><span class="ep-emoji">🦈</span>
+          <span class="ep-emoji">⭐</span><span class="ep-emoji">🌙</span><span class="ep-emoji">☀️</span><span class="ep-emoji">🌈</span><span class="ep-emoji">☁️</span>
+          <span class="ep-emoji">⚡</span><span class="ep-emoji">🌊</span><span class="ep-emoji">❄️</span><span class="ep-emoji">🌠</span><span class="ep-emoji">🔥</span>
+          <span class="ep-emoji">🍒</span><span class="ep-emoji">🍓</span><span class="ep-emoji">🍑</span><span class="ep-emoji">🍇</span><span class="ep-emoji">🍰</span>
+          <span class="ep-emoji">🧁</span><span class="ep-emoji">🍭</span><span class="ep-emoji">🍬</span><span class="ep-emoji">🧋</span><span class="ep-emoji">☕</span>
+          <span class="ep-emoji">🎀</span><span class="ep-emoji">🔮</span><span class="ep-emoji">🧸</span><span class="ep-emoji">🎵</span><span class="ep-emoji">🎶</span>
+          <span class="ep-emoji">📷</span><span class="ep-emoji">📺</span><span class="ep-emoji">💻</span><span class="ep-emoji">🕹️</span><span class="ep-emoji">💾</span>
+          <span class="ep-emoji">📼</span><span class="ep-emoji">📻</span><span class="ep-emoji">☎️</span><span class="ep-emoji">🔭</span><span class="ep-emoji">🔬</span>
+          <span class="ep-emoji">🪄</span><span class="ep-emoji">🎭</span><span class="ep-emoji">🎪</span><span class="ep-emoji">🎠</span><span class="ep-emoji">🎡</span>
+          <span class="ep-emoji">💎</span><span class="ep-emoji">👑</span><span class="ep-emoji">🗝️</span><span class="ep-emoji">🧿</span><span class="ep-emoji">🪬</span>
+          <span class="ep-emoji">☯️</span><span class="ep-emoji">⚜️</span><span class="ep-emoji">🏵️</span><span class="ep-emoji">🎗️</span><span class="ep-emoji">🌙</span>
+        </div>
+      </span>
+      <span id="mac-title-text" contenteditable="true">DreamPair</span>
+    </div>
+    <div class="mac-win-spacer"></div>
+  </div>
+
+  <div id="mac-toolbar-strip">
+    <span class="mac-menu-item">파일</span>
+    <span class="mac-menu-item">편집</span>
+    <span class="mac-menu-item">보기</span>
+    <span class="mac-menu-item">이동</span>
+    <span class="mac-menu-item">도움말</span>
+  </div>
+
+  <div id="card">
+    <div id="tpl-header">
+      <div class="corner">PAIR FILE NO.01</div>
+      <div id="tpl-pairname" contenteditable="true">PAIR</div>
+      <div id="tpl-pairtag" contenteditable="true">✦ FEEL THE STORY ✦ 우리들의 서사 ✦</div>
+      <div id="tpl-catch" contenteditable="true">두 사람을 한 줄로 표현하는 캐치프레이즈를 적어주세요.</div>
+    </div>
+
+    <div class="sec-label">CHARACTER</div>
+    <div id="tpl-chars"></div>
+    <div class="btn-row"><span class="add-btn" id="add-char">+ 캐릭터 추가</span></div>
+
+    <div class="sec-label">RELATION</div>
+    <div id="tpl-rel" contenteditable="true">관계를 한 문장으로 정리해 적어보세요. (예: 같은 반에서 만난 첫사랑)</div>
+
+    <div class="sec-label">STORY TIMELINE</div>
+    <div id="tpl-timeline-wrap"><div id="tpl-timeline"></div></div>
+    <div class="btn-row">
+      <span class="add-btn" id="add-tl">+ 사건 추가</span>
+      <span class="add-btn" id="remove-tl">− 사건 줄이기</span>
+    </div>
+
+    <div id="tpl-twocol">
+      <div class="small-box">
+        <div class="small-box-title">WORLD</div>
+        <div id="world-name" contenteditable="true">세계관 이름</div>
+        <div id="world-desc" contenteditable="true">시대적 배경, 두 사람을 둘러싼 환경을 짧게 적어주세요.</div>
+      </div>
+      <div class="small-box" id="chat-box">
+        <div id="msg-window">
+          <div id="msg-titlebar">
+            <div class="msg-tb-left">
+              <span class="msg-tl-dot r"></span>
+              <span class="msg-tl-dot y"></span>
+              <span class="msg-tl-dot g"></span>
+            </div>
+            <span id="msg-window-title" contenteditable="true">대화</span>
+            <div style="width:46px;"></div>
+          </div>
+          <div id="chat-list"></div>
+          <div id="msg-toolbar">
+            <div id="msg-toolbar-icons"><span>📷</span><span>🎵</span><span>💰</span></div>
+            <div id="msg-input-area" contenteditable="true">메시지</div>
+            <span id="msg-send">↑</span>
+          </div>
+        </div>
+        <div id="msg-status" contenteditable="true">너 없으면 영원히 잘꺼야...</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <span class="add-btn" id="add-chat-a">+ A 메시지</span>
+      <span class="add-btn" id="add-chat-b">+ B 메시지</span>
+    </div>
+
+    <div class="sec-label">COMMENT</div>
+    <div id="tpl-comments"></div>
+    <div class="btn-row"><span class="add-btn" id="add-gb">+ 코멘트 추가</span></div>
+
+    <div id="tpl-footer">ⓒ DREAM PAIR · 페어틀 · macOS STUDIO</div>
+  </div>
+
+  <div id="sticker-layer"></div>
+</div>
+
+<script>
+document.querySelectorAll('.swatch').forEach(sw=>{
+  sw.addEventListener('click',()=>{
+    const[accent,soft]=sw.dataset.c.split(',');
+    const r=document.documentElement.style;
+    r.setProperty('--user-accent',accent);
+    r.setProperty('--user-accent-soft',soft);
+    document.getElementById('cc-accent').value=accent;
+    const isLight = sw.dataset.mode === 'light';
+    document.body.classList.toggle('light-theme', isLight);
+  });
+});
+const r=document.documentElement.style;
+document.getElementById('cc-accent').addEventListener('input',(e)=>r.setProperty('--user-accent',e.target.value));
+document.getElementById('cc-bg').addEventListener('input',(e)=>r.setProperty('--mac-bg',e.target.value));
+document.getElementById('cc-card').addEventListener('input',(e)=>r.setProperty('--mac-card',e.target.value));
+document.getElementById('font-select').addEventListener('change',(e)=>r.setProperty('--user-font',e.target.value));
+document.getElementById('aa-toggle').addEventListener('change',(e)=>document.body.classList.toggle('no-aa',!e.target.checked));
+
+const iconBtn=document.getElementById('mac-title-icon');
+const iconChar=document.getElementById('mac-title-icon-char');
+const picker=document.getElementById('emoji-picker');
+iconBtn.addEventListener('click',(e)=>{e.stopPropagation();picker.classList.toggle('open');});
+document.addEventListener('click',()=>picker.classList.remove('open'));
+picker.querySelectorAll('.ep-emoji').forEach(ep=>{
+  ep.addEventListener('click',(e)=>{e.stopPropagation();iconChar.textContent=ep.textContent;picker.classList.remove('open');});
+});
+
+const charsWrap=document.getElementById('tpl-chars');
+let charsData=[
+  {quote:'"대사를 입력하세요."',name:'캐릭터 A',kw:'성격 키워드',photo:null,stats:[['나이','-'],['성별','-'],['신장','-'],['직업','-']],desc:'캐릭터에 대한 설명을 적어주세요.'},
+  {quote:'"대사를 입력하세요."',name:'캐릭터 B',kw:'성격 키워드',photo:null,stats:[['나이','-'],['성별','-'],['신장','-'],['직업','-']],desc:'캐릭터에 대한 설명을 적어주세요.'}
+];
+function renderChars(){
+  charsWrap.innerHTML='';
+  charsData.forEach((c,i)=>{
+    const card=document.createElement('div');
+    card.className='char-card';
+    const sh=c.stats.map(([l,v])=>`<div class="stat-cell"><div class="stat-label" contenteditable="true">${l}</div><div class="stat-value" contenteditable="true">${v}</div></div>`).join('');
+    card.innerHTML=`<span class="char-x">✕</span>
+      <div class="char-photo-col${c.photo?' has-photo':''}" style="${c.photo?`background-image:url('${c.photo}')`:''}">
+        <span>${c.photo?'변경':'+ 사진'}</span><input type="file" accept="image/*" class="char-photo-input">
+      </div>
+      <div class="char-info-col">
+        <div class="char-quote" contenteditable="true">${c.quote}</div>
+        <div class="char-name-row"><span class="char-name" contenteditable="true">${c.name}</span><span class="char-keywords" contenteditable="true">${c.kw}</span></div>
+        <div class="char-stats">${sh}</div>
+        <div class="char-desc" contenteditable="true">${c.desc}</div>
+      </div>`;
+    card.querySelector('.char-x').addEventListener('click',()=>{charsData.splice(i,1);renderChars();});
+    const col=card.querySelector('.char-photo-col'),inp=card.querySelector('.char-photo-input');
+    col.addEventListener('click',()=>inp.click());
+    inp.addEventListener('change',(e)=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=(ev)=>{charsData[i].photo=ev.target.result;renderChars();};rd.readAsDataURL(f);});
+    charsWrap.appendChild(card);
+  });
+}
+document.getElementById('add-char').addEventListener('click',()=>{if(charsData.length>=4)return;charsData.push({quote:'"대사를 입력하세요."',name:'새 캐릭터',kw:'성격 키워드',photo:null,stats:[['나이','-'],['성별','-'],['키','-'],['직업','-']],desc:'캐릭터에 대한 설명을 적어주세요.'});renderChars();});
+renderChars();
+
+const tlWrap=document.getElementById('tpl-timeline');
+function addTL(){const node=document.createElement('div');node.className='tl-node';node.innerHTML=`<span class="tl-del">삭제</span><div class="tl-line"><span class="timeline-dot"></span></div><div class="tl-date" contenteditable="true">YYYY.MM.DD</div><div class="tl-title" contenteditable="true">사건 제목</div><div class="tl-desc" contenteditable="true">짧은 설명</div>`;node.querySelector('.tl-del').addEventListener('click',()=>node.remove());tlWrap.appendChild(node);}
+document.getElementById('add-tl').addEventListener('click',addTL);
+document.getElementById('remove-tl').addEventListener('click',()=>{if(tlWrap.lastElementChild)tlWrap.lastElementChild.remove();});
+addTL();addTL();addTL();addTL();
+
+const chatList=document.getElementById('chat-list');
+function addChat(side){
+  const row=document.createElement('div');row.className='chat-row '+side;
+  row.innerHTML=`<div class="chat-avatar"><span>${side==='a'?'A':'B'}</span><input type="file" accept="image/*" class="chat-avatar-input"></div>
+    <div class="chat-bubble-col">
+      <div class="chat-name" contenteditable="true">${side==='a'?'우리는':'♡연인'}</div>
+      <div class="chat-bubble" contenteditable="true">대화 내용을 입력하세요.</div>
+      <div class="chat-time">오후 9:0${chatList.children.length+1}</div>
+    </div><span class="chat-del">✕</span>`;
+  row.querySelector('.chat-del').addEventListener('click',()=>row.remove());
+  const av=row.querySelector('.chat-avatar'),ai=row.querySelector('.chat-avatar-input');
+  av.addEventListener('click',()=>ai.click());
+  ai.addEventListener('change',(e)=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=(ev)=>{av.style.backgroundImage=`url('${ev.target.result}')`;av.classList.add('has-photo');};rd.readAsDataURL(f);});
+  chatList.appendChild(row);
+}
+document.getElementById('add-chat-a').addEventListener('click',()=>addChat('a'));
+document.getElementById('add-chat-b').addEventListener('click',()=>addChat('b'));
+addChat('a');addChat('b');addChat('a');
+
+const gbList=document.getElementById('tpl-comments');
+function addGB(){const row=document.createElement('div');row.className='gb-entry';row.innerHTML=`<b contenteditable="true">방문자</b> : <span contenteditable="true">코멘트를 남겨주세요.</span>`;gbList.appendChild(row);}
+document.getElementById('add-gb').addEventListener('click',addGB);addGB();
+
+const stickerLayer=document.getElementById('sticker-layer');
+document.getElementById('add-sticker-btn').addEventListener('click',()=>document.getElementById('sticker-input').click());
+document.getElementById('sticker-input').addEventListener('change',(e)=>{[...e.target.files].forEach((f,idx)=>{const rd=new FileReader();rd.onload=(ev)=>addSticker(ev.target.result,idx);rd.readAsDataURL(f);});e.target.value='';});
+function addSticker(src,idx){
+  const BS=90;
+  const place=(ratio)=>{
+    let w,h;if(ratio>=1){w=BS;h=BS/ratio;}else{h=BS;w=BS*ratio;}
+    const el=document.createElement('div');el.className='sticker';
+    el.style.left=(120+(idx||0)*20)+'px';el.style.top=(120+(idx||0)*20)+'px';
+    el.style.width=w+'px';el.style.height=h+'px';
+    el.innerHTML=`<img src="${src}" draggable="false"><span class="sticker-del">✕</span><span class="sticker-resize"></span>`;
+    stickerLayer.appendChild(el);makeStickerDraggable(el);makeStickerResizable(el.querySelector('.sticker-resize'),el);
+    el.querySelector('.sticker-del').addEventListener('click',()=>el.remove());
+  };
+  const p=new Image();p.onload=()=>place((p.naturalWidth/p.naturalHeight)||1);p.onerror=()=>place(1);p.src=src;
+}
+function makeStickerDraggable(el){
+  let sx,sy,ox,oy,drag=false;
+  el.addEventListener('pointerdown',(e)=>{if(e.target.classList.contains('sticker-resize')||e.target.classList.contains('sticker-del'))return;drag=true;sx=e.clientX;sy=e.clientY;ox=el.offsetLeft;oy=el.offsetTop;el.setPointerCapture(e.pointerId);});
+  el.addEventListener('pointermove',(e)=>{if(!drag)return;el.style.left=(ox+e.clientX-sx)+'px';el.style.top=(oy+e.clientY-sy)+'px';});
+  el.addEventListener('pointerup',()=>drag=false);el.addEventListener('pointercancel',()=>drag=false);
+}
+function makeStickerResizable(handle,el){
+  let sx,sy,sw,sh,ratio,res=false;const MIN=20;
+  handle.addEventListener('pointerdown',(e)=>{res=true;sx=e.clientX;sy=e.clientY;sw=el.offsetWidth;sh=el.offsetHeight;ratio=sw/sh||1;e.stopPropagation();handle.setPointerCapture(e.pointerId);});
+  handle.addEventListener('pointermove',(e)=>{if(!res)return;const dx=e.clientX-sx,dy=e.clientY-sy;const delta=Math.abs(dx)>Math.abs(dy)?dx:dy;let nw=Math.max(MIN,sw+delta),nh=nw/ratio;if(nh<MIN){nh=MIN;nw=nh*ratio;}el.style.width=nw+'px';el.style.height=nh+'px';e.stopPropagation();});
+  handle.addEventListener('pointerup',()=>res=false);handle.addEventListener('pointercancel',()=>res=false);
+}
+
+const previewBtn=document.getElementById('preview-btn');
+function setPreviewMode(on){document.body.classList.toggle('previewing',on);previewBtn.textContent=on?'✏️ 편집으로 돌아가기':'🔍 미리보기';previewBtn.classList.toggle('preview-active',on);}
+previewBtn.addEventListener('click',()=>setPreviewMode(!document.body.classList.contains('previewing')));
+
+document.getElementById('export-btn').addEventListener('click',()=>{
+  const was=document.body.classList.contains('previewing');
+  document.body.classList.add('exporting');
+  html2canvas(document.getElementById('frame'),{backgroundColor:null,scale:2}).then(canvas=>{
+    document.body.classList.remove('exporting');if(!was)setPreviewMode(false);
+    let name=document.getElementById('mac-title-text').textContent.trim()||'dream_pair_card';
+    name=name.replace(/[\\/:*?"<>|]+/g,'').trim().slice(0,80)||'dream_pair_card';
+    const a=document.createElement('a');a.download=name+'.png';a.href=canvas.toDataURL('image/png');a.click();
+  }).catch(()=>{document.body.classList.remove('exporting');if(!was)setPreviewMode(false);});
+});
+</script>
+</body>
+</html>
