@@ -88,7 +88,7 @@ body.light-theme .swatch{box-shadow:0 0 0 2px rgba(0,0,0,0.15);}
 #font-row{display:flex;gap:8px;align-items:center;}
 #font-row>span{font-size:11px;color:var(--mac-text3);}
 #font-row select{background:var(--mac-sidebar);color:var(--mac-text);font-size:11px;border:1px solid var(--mac-border);border-radius:6px;padding:3px 7px;font-family:var(--user-font);}
-.aa-toggle{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mac-text3);cursor:pointer;}
+/* AA removed */
 .mac-btn{display:inline-flex;align-items:center;gap:5px;background:var(--mac-hover);color:var(--mac-text);font-size:11.5px;font-weight:500;padding:5px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--mac-border);backdrop-filter:blur(8px);transition:background .15s;font-family:var(--user-font);user-select:none;}
 .mac-btn:hover{background:var(--mac-card);}
 .mac-btn.accent{background:var(--user-accent);color:#fff;border-color:transparent;}
@@ -206,9 +206,10 @@ body.light-theme .swatch{box-shadow:0 0 0 2px rgba(0,0,0,0.15);}
 #chat-list{padding:10px 8px;background:var(--mac-chat-bg);display:flex;flex-direction:column;gap:6px;}
 .chat-row{display:flex;align-items:flex-end;gap:6px;}
 .chat-row.b{flex-direction:row-reverse;}
-.chat-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;background:var(--mac-card2);background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 0 0 1.5px var(--mac-border);}
+.chat-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;background:var(--mac-card2);background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 0 0 1.5px var(--mac-border);text-decoration:none;}
 .chat-row.b .chat-avatar{background:#6e4b7b;}
 .chat-avatar.has-photo{font-size:0;}
+.chat-avatar.has-photo span{display:none;}
 .chat-avatar-input{display:none;}
 .chat-bubble-col{max-width:190px;display:flex;flex-direction:column;gap:2px;}
 .chat-row.b .chat-bubble-col{align-items:flex-end;}
@@ -256,7 +257,7 @@ body.previewing .char-x,body.previewing .char-photo-col span,body.previewing .ch
 body.exporting [contenteditable]:hover,body.exporting [contenteditable]:focus,
 body.previewing [contenteditable]:hover,body.previewing [contenteditable]:focus{background:transparent!important;}
 body.previewing .sticker{cursor:grab;}
-body.no-aa,body.no-aa *{-webkit-font-smoothing:none!important;-moz-osx-font-smoothing:unset!important;}
+
 </style>
 </head>
 <body>
@@ -297,9 +298,11 @@ body.no-aa,body.no-aa *{-webkit-font-smoothing:none!important;-moz-osx-font-smoo
         <option value="'Pretendard',system-ui,sans-serif">프리텐다드</option>
         <option value="-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif">SF Pro (시스템)</option>
         <option value="Georgia,serif">Georgia</option>
+        <option value="'Noto Serif KR',serif">Noto Serif KR</option>
+        <option value="'Nanum Gothic',sans-serif">나눔고딕</option>
+        <option value="'Nanum Myeongjo',serif">나눔명조</option>
         <option value="monospace">모노스페이스</option>
       </select>
-      <label class="aa-toggle"><input type="checkbox" id="aa-toggle" checked> 안티에일리어싱</label>
     </div>
   </div>
 </div>
@@ -430,7 +433,6 @@ document.getElementById('cc-accent').addEventListener('input',(e)=>r.setProperty
 document.getElementById('cc-bg').addEventListener('input',(e)=>r.setProperty('--mac-bg',e.target.value));
 document.getElementById('cc-card').addEventListener('input',(e)=>r.setProperty('--mac-card',e.target.value));
 document.getElementById('font-select').addEventListener('change',(e)=>r.setProperty('--user-font',e.target.value));
-document.getElementById('aa-toggle').addEventListener('change',(e)=>document.body.classList.toggle('no-aa',!e.target.checked));
 
 const iconBtn=document.getElementById('mac-title-icon');
 const iconChar=document.getElementById('mac-title-icon-char');
@@ -480,17 +482,32 @@ addTL();addTL();addTL();addTL();
 
 const chatList=document.getElementById('chat-list');
 function addChat(side){
+  const uid='avatar-'+Date.now()+'-'+Math.random().toString(36).slice(2);
   const row=document.createElement('div');row.className='chat-row '+side;
-  row.innerHTML=`<div class="chat-avatar"><span>${side==='a'?'A':'B'}</span><input type="file" accept="image/*" class="chat-avatar-input"></div>
+  row.innerHTML=`
+    <input type="file" accept="image/*" class="chat-avatar-input" id="${uid}" style="display:none">
+    <label for="${uid}" class="chat-avatar" style="cursor:pointer;">
+      <span>${side==='a'?'A':'B'}</span>
+    </label>
     <div class="chat-bubble-col">
       <div class="chat-name" contenteditable="true">${side==='a'?'우리는':'♡연인'}</div>
       <div class="chat-bubble" contenteditable="true">대화 내용을 입력하세요.</div>
       <div class="chat-time">오후 9:0${chatList.children.length+1}</div>
-    </div><span class="chat-del">✕</span>`;
+    </div>
+    <span class="chat-del">✕</span>`;
   row.querySelector('.chat-del').addEventListener('click',()=>row.remove());
-  const av=row.querySelector('.chat-avatar'),ai=row.querySelector('.chat-avatar-input');
-  av.addEventListener('click',()=>ai.click());
-  ai.addEventListener('change',(e)=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=(ev)=>{av.style.backgroundImage=`url('${ev.target.result}')`;av.classList.add('has-photo');};rd.readAsDataURL(f);});
+  const ai=row.querySelector('.chat-avatar-input');
+  const av=row.querySelector('.chat-avatar');
+  ai.addEventListener('change',(e)=>{
+    const f=e.target.files[0];if(!f)return;
+    const rd=new FileReader();
+    rd.onload=(ev)=>{
+      av.style.backgroundImage=`url('${ev.target.result}')`;
+      av.classList.add('has-photo');
+      av.querySelector('span').style.display='none';
+    };
+    rd.readAsDataURL(f);
+  });
   chatList.appendChild(row);
 }
 document.getElementById('add-chat-a').addEventListener('click',()=>addChat('a'));
