@@ -206,10 +206,9 @@ body.light-theme .swatch{box-shadow:0 0 0 2px rgba(0,0,0,0.15);}
 #chat-list{padding:10px 8px;background:var(--mac-chat-bg);display:flex;flex-direction:column;gap:6px;}
 .chat-row{display:flex;align-items:flex-end;gap:6px;}
 .chat-row.b{flex-direction:row-reverse;}
-.chat-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;background:var(--mac-card2);background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 0 0 1.5px var(--mac-border);text-decoration:none;}
-.chat-row.b .chat-avatar{background:#6e4b7b;}
+.chat-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;background:#48484a;background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 0 0 1.5px var(--mac-border);}
+.chat-avatar.b{background-color:#6e4b7b;}
 .chat-avatar.has-photo{font-size:0;}
-.chat-avatar.has-photo span{display:none;}
 .chat-avatar-input{display:none;}
 .chat-bubble-col{max-width:190px;display:flex;flex-direction:column;gap:2px;}
 .chat-row.b .chat-bubble-col{align-items:flex-end;}
@@ -393,6 +392,7 @@ body.previewing .sticker{cursor:grab;}
           </div>
           <div id="chat-list"></div>
           <div id="msg-toolbar">
+            <div id="msg-toolbar-icons"><span>📷</span><span>🎵</span><span>💰</span></div>
             <div id="msg-input-area" contenteditable="true">메시지</div>
             <span id="msg-send">↑</span>
           </div>
@@ -481,13 +481,13 @@ addTL();addTL();addTL();addTL();
 
 const chatList=document.getElementById('chat-list');
 function addChat(side){
-  const uid='avatar-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-  const row=document.createElement('div');row.className='chat-row '+side;
+  const row=document.createElement('div');
+  row.className='chat-row '+side;
   row.innerHTML=`
-    <input type="file" accept="image/*" class="chat-avatar-input" id="${uid}" style="display:none">
-    <label for="${uid}" class="chat-avatar" style="cursor:pointer;">
+    <div class="chat-avatar ${side==='b'?'b':''}">
       <span>${side==='a'?'A':'B'}</span>
-    </label>
+      <input type="file" accept="image/*" class="chat-avatar-input">
+    </div>
     <div class="chat-bubble-col">
       <div class="chat-name" contenteditable="true">${side==='a'?'우리는':'♡연인'}</div>
       <div class="chat-bubble" contenteditable="true">대화 내용을 입력하세요.</div>
@@ -495,17 +495,19 @@ function addChat(side){
     </div>
     <span class="chat-del">✕</span>`;
   row.querySelector('.chat-del').addEventListener('click',()=>row.remove());
-  const ai=row.querySelector('.chat-avatar-input');
-  const av=row.querySelector('.chat-avatar');
-  ai.addEventListener('change',(e)=>{
-    const f=e.target.files[0];if(!f)return;
-    const rd=new FileReader();
-    rd.onload=(ev)=>{
-      av.style.backgroundImage=`url('${ev.target.result}')`;
-      av.classList.add('has-photo');
-      av.querySelector('span').style.display='none';
+  const avatar=row.querySelector('.chat-avatar');
+  const avatarInput=row.querySelector('.chat-avatar-input');
+  avatar.addEventListener('click',()=>avatarInput.click());
+  avatarInput.addEventListener('click',(e)=>e.stopPropagation());
+  avatarInput.addEventListener('change',(e)=>{
+    const file=e.target.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      avatar.style.backgroundImage=`url('${ev.target.result}')`;
+      avatar.classList.add('has-photo');
+      avatar.querySelector('span').style.display='none';
     };
-    rd.readAsDataURL(f);
+    reader.readAsDataURL(file);
   });
   chatList.appendChild(row);
 }
