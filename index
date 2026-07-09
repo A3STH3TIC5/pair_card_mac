@@ -395,7 +395,7 @@ body.no-aa,body.no-aa *{-webkit-font-smoothing:none!important;-moz-osx-font-smoo
             <span id="msg-send">↑</span>
           </div>
         </div>
-        <div id="msg-status" contenteditable="true">너 없으면 영원히 잘꺼야...</div>
+        <div id="msg-status" contenteditable="true">보내지 못한 메세지......</div>
       </div>
     </div>
     <div class="btn-row">
